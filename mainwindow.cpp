@@ -4,6 +4,15 @@
 #include <QPdfWriter>
 #include <QPainter>
 #include <QTextDocument>
+#include <QtNetwork/QSslSocket>
+#include <QMessageBox>
+#include <QDebug>
+#include <QVBoxLayout>
+#include <QTableView>
+#include <QTextEdit>
+
+#include "smtp.h"
+
 
 #include "patient.h"
 
@@ -289,4 +298,64 @@ void MainWindow::on_trier_clicked() {
                              // QMessageBox::Cancel);
     }
     }
+}
+
+
+
+void MainWindow::on_mail_clicked()
+{
+    // Create a new QWidget for the email input dialog
+    QWidget *emailDialog = new QWidget(this);
+    emailDialog->setWindowTitle("Send Email");
+
+    // Create input fields for the email details
+    QVBoxLayout *layout = new QVBoxLayout(emailDialog);
+
+    QLabel *fromLabel = new QLabel("From:", emailDialog);
+    QLineEdit *fromLineEdit = new QLineEdit(emailDialog);
+
+    QLabel *toLabel = new QLabel("To:", emailDialog);
+    QLineEdit *toLineEdit = new QLineEdit(emailDialog);
+
+    QLabel *subjectLabel = new QLabel("Subject:", emailDialog);
+    QLineEdit *subjectLineEdit = new QLineEdit(emailDialog);
+
+    QLabel *messageLabel = new QLabel("Message:", emailDialog);
+    QTextEdit *messageTextEdit = new QTextEdit(emailDialog);
+
+    QPushButton *sendButton = new QPushButton("Send Email", emailDialog);
+
+    layout->addWidget(fromLabel);
+    layout->addWidget(fromLineEdit);
+    layout->addWidget(toLabel);
+    layout->addWidget(toLineEdit);
+    layout->addWidget(subjectLabel);
+    layout->addWidget(subjectLineEdit);
+    layout->addWidget(messageLabel);
+    layout->addWidget(messageTextEdit);
+    layout->addWidget(sendButton);
+
+    emailDialog->setLayout(layout);
+    emailDialog->resize(400, 300);
+    emailDialog->show();
+
+    // Connect the Send button to the function that sends the email
+    connect(sendButton, &QPushButton::clicked, [this, fromLineEdit, toLineEdit, subjectLineEdit, messageTextEdit, emailDialog](){
+        // Get the input values
+        QString from = fromLineEdit->text();
+        QString to = toLineEdit->text();
+        QString subject = subjectLineEdit->text();
+        QString message = messageTextEdit->toPlainText();
+
+        // Send the email using SmtpClient
+        smtp smtpClient;
+        smtpClient.sendEmail(from, to, subject, message);
+
+        // Show success message
+        QMessageBox::information(this, "Email Sent", "Your email has been sent successfully!");
+
+        // Close the email dialog
+        emailDialog->close();
+    });
+
 }

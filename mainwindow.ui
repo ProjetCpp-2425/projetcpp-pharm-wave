@@ -6334,7 +6334,7 @@ QLabel {
           <widget class="QComboBox" name="lowHigh">
            <property name="geometry">
             <rect>
-             <x>930</x>
+             <x>1060</x>
              <y>140</y>
              <width>181</width>
              <height>31</height>
@@ -6496,6 +6496,36 @@ QLabel {
              <string>AGE</string>
             </property>
            </item>
+          </widget>
+          <widget class="QPushButton" name="mail">
+           <property name="geometry">
+            <rect>
+             <x>930</x>
+             <y>140</y>
+             <width>81</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">*{
+    background-color: #6FAF92;  /* Medium green button */
+    border: 1px solid #388E3C;  /* Darker green border */
+    border-radius: 5px;
+    color: #FFFFFF;             /* White text for contrast */
+    padding: 5px;
+}
+
+*:hover {
+    background-color: #81C784;  /* Lighter green on hover */
+}</string>
+           </property>
+           <property name="text">
+            <string>mail</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>../../../Users/Admin/Downloads/report.png</normaloff>../../../Users/Admin/Downloads/report.png</iconset>
+           </property>
           </widget>
          </widget>
         </item>
