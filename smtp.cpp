@@ -50,7 +50,7 @@ bool smtp::sendEmail(QString &from, QString &to, QString &subject, QString &mess
     }
 
     // Send Base64-encoded app password
-    QString base64Password = QString("hkpv dvqc byyk uign").toUtf8().toBase64();// Replace with actual App Password
+    QString base64Password = QString("tzfs kwsm csjl wmmo").toUtf8().toBase64();// Replace with actual App Password
     if (!sendCommand(socket, base64Password + "\r\n", "235")) {
         return false;
     }
