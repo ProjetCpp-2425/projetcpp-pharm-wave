@@ -11,8 +11,12 @@ QT += network
 
 QT += charts
 QT += widgets charts sql
+QT += core gui widgets printsupport
 
 
+# Add the qrcodegen source file
+INCLUDEPATH += $$PWD/QR-Code-generator-master/cpp
+SOURCES += $$PWD/QR-Code-generator-master/cpp/qrcodegen.cpp \
 
 SOURCES += \
     connection.cpp \

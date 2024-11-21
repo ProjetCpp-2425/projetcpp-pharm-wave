@@ -24,6 +24,18 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QtCharts/QPieSeries>
+#include "qrcodegen.hpp"  // The correct include based on the relative path from the project directory
+#include <QPrintDialog>
+#include <QPainter>
+#include <QFormLayout>
+#include <QPrinter>
+#include <QPixmap>
+#include <QPrinter>
+#include <QPainter>
+#include <QPrintDialog>
+#include <QMessageBox>
+#include <QImage>
+
 
 
 
@@ -51,6 +63,8 @@ MainWindow::MainWindow(QWidget *patient)
    connect(ui->PDF, &QPushButton::clicked, this, &MainWindow::on_PDF_clicked);
    connect(ui->stat, &QPushButton::clicked, this, &MainWindow::showPatientStatistics);
    connect(ui->recherche1, &QPushButton::clicked, this, &MainWindow::on_recherche1_clicked);
+   connect(ui->QR, &QPushButton::clicked, this, &MainWindow::on_QR_clicked);
+
 
 
 
@@ -291,7 +305,7 @@ void MainWindow::on_trier_clicked() {
 
 
 
-void MainWindow::on_mail_clicked()
+/*void MainWindow::on_mail_clicked()
 {
     // Create a new QWidget for the email input dialog
     QWidget *emailDialog = new QWidget(this);
@@ -348,7 +362,116 @@ void MainWindow::on_mail_clicked()
         emailDialog->close();
     });
 
+}*/
+void MainWindow::on_mail_clicked()
+{
+    // Créer une nouvelle fenêtre pour l'interface de mail
+    QWidget *emailDialog = new QWidget(this);
+    emailDialog->setWindowTitle("Envoyer un Email");
+
+    // Créer un layout vertical
+    QVBoxLayout *mainLayout = new QVBoxLayout(emailDialog);
+
+    // Titre de la fenêtre
+    QLabel *titleLabel = new QLabel("Envoyer un Email", emailDialog);
+    titleLabel->setStyleSheet("font-size: 22px; font-weight: bold; color: #388e3c; margin-bottom: 20px;");
+    titleLabel->setAlignment(Qt::AlignCenter);
+
+    // Champs pour l'adresse de l'expéditeur
+    QLabel *fromLabel = new QLabel("De :", emailDialog);
+    QLineEdit *fromLineEdit = new QLineEdit(emailDialog);
+    fromLineEdit->setPlaceholderText("Adresse email de l'expéditeur");
+
+    // Champs pour l'adresse du destinataire
+    QLabel *toLabel = new QLabel("À :", emailDialog);
+    QLineEdit *toLineEdit = new QLineEdit(emailDialog);
+    toLineEdit->setPlaceholderText("Adresse email du destinataire");
+
+    // Champs pour l'objet
+    QLabel *subjectLabel = new QLabel("Objet :", emailDialog);
+    QLineEdit *subjectLineEdit = new QLineEdit(emailDialog);
+    subjectLineEdit->setPlaceholderText("Sujet de l'email");
+
+    // Champ pour le corps du message
+    QLabel *messageLabel = new QLabel("Message :", emailDialog);
+    QTextEdit *messageTextEdit = new QTextEdit(emailDialog);
+    messageTextEdit->setPlaceholderText("Entrez votre message ici...");
+
+    // Bouton d'envoi
+    QPushButton *sendButton = new QPushButton("Envoyer", emailDialog);
+    sendButton->setStyleSheet("background-color: #388e3c; color: white; font-weight: bold; padding: 10px; border-radius: 5px;");
+
+    // Bouton quitter
+    QPushButton *quitButton = new QPushButton("Quitter", emailDialog);
+    quitButton->setStyleSheet("background-color: #f44336; color: white; font-weight: bold; padding: 10px; border-radius: 5px;");
+
+    // Ajouter les widgets au layout principal
+    mainLayout->addWidget(titleLabel);
+    mainLayout->addWidget(fromLabel);
+    mainLayout->addWidget(fromLineEdit);
+    mainLayout->addWidget(toLabel);
+    mainLayout->addWidget(toLineEdit);
+    mainLayout->addWidget(subjectLabel);
+    mainLayout->addWidget(subjectLineEdit);
+    mainLayout->addWidget(messageLabel);
+    mainLayout->addWidget(messageTextEdit);
+
+    // Ajouter les boutons à un layout horizontal
+    QHBoxLayout *buttonLayout = new QHBoxLayout();
+    buttonLayout->addWidget(sendButton);
+    buttonLayout->addWidget(quitButton);
+
+    // Ajouter le layout des boutons au layout principal
+    mainLayout->addLayout(buttonLayout);
+
+    // Appliquer des styles pour le fond et le texte
+    emailDialog->setStyleSheet("background-color: #e8f5e9; color: #388e3c; font-family: Arial; font-size: 14px;");
+    sendButton->setStyleSheet("background-color: #388e3c; color: white; font-weight: bold; padding: 10px; border-radius: 5px;");
+    quitButton->setStyleSheet("background-color: #f44336; color: white; font-weight: bold; padding: 10px; border-radius: 5px;");
+
+    emailDialog->resize(600, 350);  // Ajuster la taille selon vos préférences
+
+    // Centrer la fenêtre de l'email
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QRect screenGeometry = screen->geometry();  // Obtenir la géométrie de l'écran
+    int x = (screenGeometry.width() - emailDialog->width()) / 2;
+    int y = (screenGeometry.height() - emailDialog->height()) / 2;
+    emailDialog->move(x, y);  // Positionner la fenêtre au centre
+
+    emailDialog->show();
+
+    // Connexion du bouton "Envoyer"
+    connect(sendButton, &QPushButton::clicked, [this, fromLineEdit, toLineEdit, subjectLineEdit, messageTextEdit, emailDialog](){
+        QString from = fromLineEdit->text();
+        QString to = toLineEdit->text();
+        QString subject = subjectLineEdit->text();
+        QString message = messageTextEdit->toPlainText();
+
+        // Validation des champs
+        if (from.isEmpty() || to.isEmpty() || subject.isEmpty() || message.isEmpty()) {
+            QMessageBox::warning(this, "Erreur", "Tous les champs doivent être remplis !");
+            return;
+        }
+
+        // Envoyer l'email via le client SMTP
+        smtp smtpClient;
+        bool success = smtpClient.sendEmail(from, to, subject, message);
+
+        if (success) {
+            QMessageBox::information(this, "Succès", "L'email a été envoyé avec succès !");
+        } else {
+            QMessageBox::critical(this, "Échec", "L'envoi de l'email a échoué. Vérifiez les détails et réessayez.");
+        }
+
+        emailDialog->close();
+    });
+
+    // Connexion du bouton "Quitter"
+    connect(quitButton, &QPushButton::clicked, [emailDialog](){
+        emailDialog->close();
+    });
 }
+
 
 
 
@@ -448,6 +571,7 @@ void MainWindow::setupMailInterface()
 
 
 
+
 void MainWindow::showPatientStatistics() {
     // Instance de la classe `patient`
     class patient pt;
@@ -524,4 +648,336 @@ void MainWindow::on_recherche1_clicked()
            QMessageBox::information(this, "Résultat", "Aucun patient trouvé avec ce numéro social.");
        }
 }
+QImage MainWindow::generateQRCodeImage(const QString &data)
+{
+    const qrcodegen::QrCode qr = qrcodegen::QrCode::encodeText(data.toStdString().c_str(), qrcodegen::QrCode::Ecc::LOW);
 
+       int size = qr.getSize();
+       QImage image(size, size, QImage::Format_RGB32);
+
+       image.fill(Qt::white);
+
+       for (int y = 0; y < size; ++y) {
+           for (int x = 0; x < size; ++x) {
+               if (qr.getModule(x, y)) {
+                   image.setPixelColor(x, y, Qt::black);
+               }
+           }
+       }
+       return image.scaled(300, 300, Qt::KeepAspectRatio);
+   }
+/*QString MainWindow::fetchRepairData(const QString &idReparation)
+{
+    // Assuming you have a QSqlDatabase connection already established.
+    QSqlQuery query;
+
+    // Updated query to join ENREGISTRER and ACHETER, removing duplicates for VIGNETTE
+    query.prepare(
+        "SELECT DISTINCT A.VIGNETTE, E.ID_TRAN "
+        "FROM ENREGISTRER E "
+        "INNER JOIN ACHETER A ON E.VIGNETTE = A.VIGNETTE "
+        "WHERE E.ID_TRAN = :idReparation"
+    );
+    query.bindValue(":idReparation", idReparation);
+
+    if (!query.exec()) {
+        qDebug() << "Database query failed: " << query.lastError();
+        return "";
+    }
+
+    if (query.next()) {
+        QString vignette = query.value("VIGNETTE").toString();
+        QString idTran = query.value("ID_TRAN").toString();
+
+        // Format the fetched data as a string
+        QString repairData = "VIGNETTE: " + vignette + "\n"
+                             "ID_TRAN: " + idTran;
+
+        return repairData;
+    }
+
+    return "";  // Return an empty string if no data is found
+}*/
+QString MainWindow::fetchPatientData(const QString &idPatient) {
+    QSqlQuery query;
+    query.prepare("SELECT * FROM PATIENT WHERE NUM_SOCIALE = :id");
+    query.bindValue(":id", idPatient);
+
+    if (!query.exec()) {
+        qDebug() << "Database error: " << query.lastError().text();
+        return "";
+    }
+
+    if (query.next()) {
+        // Construire une chaîne contenant les informations du patient
+        QString patientData = QString("Nom: %1\nPrénom: %2\nÂge: %3\nGenre: %4\nNuméro sociale: %5\nTéléphone: %6\nAdresse: %7\nE-mail: %8")
+            .arg(query.value("NOM").toString())
+            .arg(query.value("PRENOM").toString())
+            .arg(query.value("AGE").toString())
+            .arg(query.value("GENRE").toString())
+            .arg(query.value("NUM_SOCIALE").toString())
+            .arg(query.value("TELEPHONE").toString())
+            .arg(query.value("ADRESSE").toString())
+            .arg(query.value("E_MAIL").toString());
+
+        return patientData;
+    }
+
+    return "";  // Si aucun patient n'est trouvé
+}
+
+
+void MainWindow::generatePDF(const QString &filePath, const QString &repairData, const QImage &qrCodeImage)
+{
+    // Fetch the repair data using the fetchRepairData function
+    // QString repairData = fetchRepairData(idReparation);
+
+     // If no data is found for the given repair ID
+     if (repairData.isEmpty()) {
+         QMessageBox::warning(this, "Error", "No data found for the given Reparation ID.");
+         return;
+     }
+
+     // Create a PDF writer and painter to generate the PDF
+     QPdfWriter pdfWriter(filePath);
+     QPainter painter(&pdfWriter);
+     pdfWriter.setPageSize(QPageSize(QPageSize::A4));
+     pdfWriter.setPageOrientation(QPageLayout::Portrait);
+
+     // Set background color for the top section
+     painter.fillRect(QRect(0, 0, pdfWriter.width(), 1000), QColor(255, 140, 0));  // Background color (orange)
+
+     // Title font and text
+     QFont titleFont("Arial", 24, QFont::Bold);
+     painter.setFont(titleFont);
+     painter.drawText(100, 150, "PATIENT Report");
+
+     // Content font for Repair Data
+     QFont contentFont("Arial", 12);
+     painter.setFont(contentFont);
+
+     // Define initial Y-position for the repair data
+     int yPos = 400;  // Starting position for the repair details
+     int lineSpacing = 1000;  // Increase space between each line (increased from 20 to 40)
+
+     // Split the repair data into lines and draw each line vertically
+     QStringList repairLines = repairData.split("\n");
+     for (const QString &line : repairLines) {
+         painter.drawText(100, yPos, line);
+         yPos += lineSpacing;  // Move down for the next line
+     }
+
+     // Generate a URL or text for the QR code with the repair data
+     QString qrCodeData = "Repair Details:\n" + repairData;
+
+     // Generate the QR code from the data (you will need a library like Qt's QZXing or similar for generating the QR)
+   //  QImage qrImage = generateQRCode(qrCodeData);  // Assume generateQRCode is a function to create the QR image
+
+     // Adjust the Y position before drawing the QR code
+     yPos += 80;  // Add more space before the QR code (increased from 50 to 80)
+
+     // Draw QR Code (this is the link to the PDF file or repair info)
+     QRect qrRect(100, yPos, 150, 150);  // Positioned QR code
+   //  painter.drawImage(qrRect, qrImage);
+
+     // Add clickable link (assuming this URL leads to the repair details or PDF)
+     painter.setFont(QFont("Arial", 10));
+     QRect linkRect(100, yPos + 180, 300, 20);  // Define the clickable area
+     painter.drawText(linkRect, Qt::AlignLeft, "Click here to view the repair details");
+
+     // Set the link in the PDF (the link will open a URL when clicked)
+//     pdfWriter.addAction(QAction("Open repair details", this), linkRect);
+
+     // Optionally, add a description below the QR code
+     painter.setFont(QFont("Arial", 10));
+    // painter.drawText(100, yPos + 200, "Scan the QR code to view or download the repair details");
+
+     // End the painter
+     painter.end();
+
+     // Show success message after PDF generation
+     QMessageBox::information(this, "Success", "PDF generated successfully.");
+}
+void MainWindow:: on_QR_clicked()
+{
+    QWidget *qrWidget = new QWidget(this);
+        qrWidget->setWindowTitle("QR Code Generator");
+        qrWidget->setFixedSize(400, 600);
+
+        // Center the widget on the screen
+        qrWidget->move((this->width() - qrWidget->width()) / 2, (this->height() - qrWidget->height()) / 2);
+
+        // Layout for widget
+        QVBoxLayout *layout = new QVBoxLayout(qrWidget);
+        layout->setContentsMargins(20, 20, 20, 20);
+        layout->setSpacing(15);
+
+        // Style for the widget
+        qrWidget->setStyleSheet(
+            "QWidget {"
+            "background-color: #f0f0f0;"
+            "border-radius: 10px;"
+            "border: 1px solid #ccc;"
+            "}");
+
+        // Input for ID Reparation
+        QLineEdit *idPatientLineEdit = new QLineEdit(qrWidget);
+            idPatientLineEdit->setPlaceholderText("Enter Patient Social Number");
+            idPatientLineEdit->setFont(QFont("Arial", 14));
+            idPatientLineEdit->setFixedHeight(40);
+            idPatientLineEdit->setStyleSheet(
+            "QLineEdit {"
+            "background-color: white;"
+            "border: 1px solid #ccc;"
+            "border-radius: 5px;"
+            "padding-left: 10px;"
+            "}");
+         layout->addWidget(idPatientLineEdit);
+
+        // Button to generate QR Code
+        QPushButton *generateQRCodeButton = new QPushButton("Generate QR Code", qrWidget);
+        generateQRCodeButton->setStyleSheet(
+            "QPushButton {"
+            "background-color: #4CAF50;"
+            "color: white;"
+            "border-radius: 5px;"
+            "padding: 10px 20px;"
+            "font-size: 14px;"
+            "border: none;"
+            "}"
+            "QPushButton:hover {"
+            "background-color: #45a049;"
+            "}");
+        layout->addWidget(generateQRCodeButton);
+
+        // Display QR code
+        QLabel *qrCodeLabel = new QLabel(qrWidget);
+        qrCodeLabel->setAlignment(Qt::AlignCenter);
+        qrCodeLabel->setFixedSize(300, 300);
+        qrCodeLabel->setStyleSheet(
+            "QLabel {"
+            "border: 1px solid #ccc;"
+            "background-color: white;"
+            "border-radius: 5px;"
+            "}");
+        layout->addWidget(qrCodeLabel);
+
+        // Button to generate PDF
+        QPushButton *generatePDFButton = new QPushButton("Generate PDF", qrWidget);
+        generatePDFButton->setStyleSheet(
+            "QPushButton {"
+            "background-color: #2196F3;"
+            "color: white;"
+            "border-radius: 5px;"
+            "padding: 10px 20px;"
+            "font-size: 14px;"
+            "border: none;"
+            "}"
+            "QPushButton:hover {"
+            "background-color: #1e88e5;"
+            "}");
+        layout->addWidget(generatePDFButton);
+
+        // Print QR Code Button
+        QPushButton *printButton = new QPushButton("Print QR Code", qrWidget);
+        printButton->setStyleSheet(
+            "QPushButton {"
+            "background-color: #FFC107;"
+            "color: white;"
+            "border-radius: 5px;"
+            "padding: 10px 20px;"
+            "font-size: 14px;"
+            "border: none;"
+            "}"
+            "QPushButton:hover {"
+            "background-color: #ffb300;"
+            "}");
+        layout->addWidget(printButton);
+
+        // Quit button
+        QPushButton *quitButton = new QPushButton("Quit", qrWidget);
+        quitButton->setStyleSheet(
+            "QPushButton {"
+            "background-color: #f44336;"
+            "color: white;"
+            "border-radius: 5px;"
+            "padding: 10px 20px;"
+            "font-size: 14px;"
+            "border: none;"
+            "}"
+            "QPushButton:hover {"
+            "background-color: #e53935;"
+            "}");
+        layout->addWidget(quitButton);
+
+        // Connect Generate QR Code button
+       connect(generateQRCodeButton, &QPushButton::clicked, this, [this, idPatientLineEdit, qrCodeLabel]() {
+              QString idPatient = idPatientLineEdit->text();
+               if (idPatient.isEmpty()) {
+                QMessageBox::warning(this, "Input Error", "Please enter a valid Patient Social Number.");
+                return;
+            }
+
+            // Fetch repair data from the database using the ID Reparation
+             /*  QString patientData = fetchPatientData(idPatient);
+             // Fetch repair details
+
+             if (patientData.isEmpty()) {
+                QMessageBox::warning(this, "Error", "No patient data found for this Social Number.");
+                return;
+            }*/
+               QString patientData = fetchPatientData(idPatient);
+               if (patientData.isEmpty()) {
+                   QMessageBox::warning(this, "Erreur", "Aucune donnée trouvée pour ce numéro de patient.");
+                   return;
+               }
+
+            // Generate the QR code with the repair data
+             QImage qrCodeImage = generateQRCodeImage(patientData);  // Use patient data here
+              qrCodeLabel->setPixmap(QPixmap::fromImage(qrCodeImage).scaled(300, 300, Qt::KeepAspectRatio));
+        });
+
+        // Connect Generate PDF button
+         connect(generatePDFButton, &QPushButton::clicked, this, [this, idPatientLineEdit]() {
+            QString idPatient = idPatientLineEdit->text();
+            if (idPatient.isEmpty()) {
+                QMessageBox::warning(this, "Input Error", "Please enter a valid Reparation ID.");
+                return;
+            }
+
+            // Fetch repair data from the database using the ID Reparation
+            QString repairData = fetchPatientData(idPatient);  // Fetch repair details
+
+            if (repairData.isEmpty()) {
+                QMessageBox::warning(this, "Error", "No repair data found for this ID.");
+                return;
+            }
+
+            // Generate the PDF file
+            QString filePath = QFileDialog::getSaveFileName(this, "Save PDF", "", "PDF Files (*.pdf)");
+            if (filePath.isEmpty())
+                return;
+
+            // Create the PDF with repair data and QR Code
+            QImage qrCodeImage = generateQRCodeImage(repairData);  // Use the repair data for QR code
+            generatePDF(filePath, repairData, qrCodeImage);  // Pass the repair data and QR code here
+        });
+
+        // Print QR Code
+        connect(printButton, &QPushButton::clicked, this, [this, qrCodeLabel]() {
+            QPrinter printer;
+            QPrintDialog printDialog(&printer, this);
+            if (printDialog.exec() == QDialog::Accepted) {
+                QPainter painter(&printer);
+                QRect rect = painter.viewport();
+                int width = qrCodeLabel->pixmap().width();
+                int height = qrCodeLabel->pixmap().height();
+                painter.drawPixmap((rect.width() - width) / 2, (rect.height() - height) / 2, qrCodeLabel->pixmap());
+            }
+        });
+
+        // Quit Button - Close the QR Widget
+        connect(quitButton, &QPushButton::clicked, qrWidget, &QWidget::close);
+
+        qrWidget->show();  // Show the widget
+}

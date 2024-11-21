@@ -13,6 +13,7 @@
 #include "ui_mainwindow.h"
 
 
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -43,6 +44,7 @@ private slots:
 
 
 
+
     void on_ajout_clicked();
 
 
@@ -62,6 +64,9 @@ private slots:
 
 
     void on_mail_clicked();
+   void  on_QR_clicked();
+
+
 
 
 
@@ -71,6 +76,10 @@ private slots:
     void afficherPatientParNumSocial();
 
     void on_recherche1_clicked();
+   // QString fetchRepairData(const QString &idReparation);
+    void generatePDF(const QString &filePath, const QString &repairData, const QImage &qrCodeImage);
+    QImage generateQRCodeImage(const QString &data);
+    QString fetchPatientData(const QString &idPatient);
 
 private:
     Ui::MainWindow *ui;
