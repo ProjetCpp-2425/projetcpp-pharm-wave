@@ -10,6 +10,22 @@
 #include <QVBoxLayout>
 #include <QTableView>
 #include <QTextEdit>
+#include <QScreen>
+#include <QMainWindow>
+#include <QDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QTextEdit>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QMessageBox>
+#include <QScreen>
+#include <QGuiApplication>
+#include <QtCharts/QChart>
+#include <QtCharts/QChartView>
+#include <QtCharts/QPieSeries>
+
+
 
 #include "smtp.h"
 
@@ -25,14 +41,20 @@ MainWindow::MainWindow(QWidget *patient)
     ui->tableView->setModel(p.afficher());
 
     // Connect buttons to respective slots
-  //  connect(ui->projet, &QPushButton::clicked, this, &MainWindow::on_projet_clicked);
-    //connect(ui->employer, &QPushButton::clicked, this, &MainWindow::on_employer_clicked);
-    //connect(ui->materielle, &QPushButton::clicked, this, &MainWindow::on_materielle_clicked);
-    //connect(ui->fournisseur, &QPushButton::clicked, this, &MainWindow::on_fournisseur_clicked);
-    //connect(ui->facture, &QPushButton::clicked, this, &MainWindow::on_facture_clicked);
-   // connect(ui->ajout, &QPushButton::clicked, this, &MainWindow::on_ajout_clicked);
-    //connect(ui->supprimer, &QPushButton::clicked, this, &MainWindow::on_supprimer_clicked);
-   // connect(ui->PDF, &QPushButton::clicked, this, &MainWindow::on_PDF_clicked);
+    connect(ui->projet, &QPushButton::clicked, this, &MainWindow::on_projet_clicked);
+    connect(ui->employer, &QPushButton::clicked, this, &MainWindow::on_employer_clicked);
+    connect(ui->materielle, &QPushButton::clicked, this, &MainWindow::on_materielle_clicked);
+    connect(ui->fournisseur, &QPushButton::clicked, this, &MainWindow::on_fournisseur_clicked);
+    connect(ui->facture, &QPushButton::clicked, this, &MainWindow::on_facture_clicked);
+   connect(ui->ajout, &QPushButton::clicked, this, &MainWindow::on_ajout_clicked);
+    connect(ui->supprimer, &QPushButton::clicked, this, &MainWindow::on_supprimer_clicked);
+   connect(ui->PDF, &QPushButton::clicked, this, &MainWindow::on_PDF_clicked);
+   connect(ui->stat, &QPushButton::clicked, this, &MainWindow::showPatientStatistics);
+   connect(ui->recherche1, &QPushButton::clicked, this, &MainWindow::on_recherche1_clicked);
+
+
+
+
 
 }
 
@@ -136,26 +158,6 @@ void MainWindow::on_ajout_clicked()
                                           "Cliquez sur Annuler pour fermer."), QMessageBox::Cancel);
     }
 }
-//
-/*void MainWindow::on_delete_2_clicked()
-{
-    int NUM_SOCIALE = ui->NUM_SOCIALE->text().toInt();
-
-    bool test = p.supprimer(NUM_SOCIALE);
-    if(test)
-    {
-        ui->tableView->setModel(p.afficher());  // Actualise l'affichage de la table
-        QMessageBox::information(nullptr, QObject::tr("Suppression réussie"),
-                                 QObject::tr("L'élément a été supprimé avec succès.\n"
-                                             "Cliquez sur Annuler pour fermer."), QMessageBox::Cancel);
-    }
-    else
-    {
-        QMessageBox::critical(nullptr, QObject::tr("Échec de la suppression"),
-                              QObject::tr("Erreur lors de la suppression.\n"
-                                          "Cliquez sur Annuler pour fermer."), QMessageBox::Cancel);
-    }
-}*/
 
 
 
@@ -282,20 +284,7 @@ void MainWindow::on_trier_clicked() {
             QMessageBox::information(this, QObject::tr("Update Success"),
                                      QObject::tr("Record updated successfully.\nClick Cancel to exit."),
                                      QMessageBox::Cancel);
-        //} else if (ui->age->currentText() == "DUREE") {  // Sort by DUREE
-            //ui->tableView->setModel(s.trier_DUREE_dsc());
-            //QMessageBox::information(this, QObject::tr("Update Success"),
-                                    // QObject::tr("Record updated successfully.\nClick Cancel to exit."),
-                                    // QMessageBox::Cancel);
-        //} else {  // Error if none of the expected options are matched
-            //QMessageBox::critical(this, QObject::tr("Update Failed"),
-                                 // QObject::tr("Error: Could not update the record.\nClick Cancel to exit."),
-                                 // QMessageBox::Cancel);
-       // }
-   // } else {  // Error if none of the sorting options are matched
-       // QMessageBox::critical(this, QObject::tr("Update Failed"),
-                             // QObject::tr("Error: Could not update the record.\nClick Cancel to exit."),
-                             // QMessageBox::Cancel);
+
     }
     }
 }
@@ -340,6 +329,7 @@ void MainWindow::on_mail_clicked()
     emailDialog->show();
 
     // Connect the Send button to the function that sends the email
+     setupMailInterface();
     connect(sendButton, &QPushButton::clicked, [this, fromLineEdit, toLineEdit, subjectLineEdit, messageTextEdit, emailDialog](){
         // Get the input values
         QString from = fromLineEdit->text();
@@ -359,3 +349,179 @@ void MainWindow::on_mail_clicked()
     });
 
 }
+
+
+
+void MainWindow::setupMailInterface()
+{
+    // Widget principal pour l'interface
+    QDialog *mailWidget = new QDialog(this);
+    mailWidget->setWindowTitle("Mailing Interface");
+    mailWidget->resize(600, 500);
+
+    // Couleur de fond et style global
+    mailWidget->setStyleSheet("background-color: #f4f4f4; color: #333; font-family: Arial; font-size: 14px;");
+
+    // Disposition principale
+    QVBoxLayout *mainLayout = new QVBoxLayout(mailWidget);
+
+    // Titre
+    QLabel *titleLabel = new QLabel("Envoyer un Email", mailWidget);
+    titleLabel->setStyleSheet("font-size: 20px; font-weight: bold; color: #4CAF50; margin-bottom: 20px;");
+    titleLabel->setAlignment(Qt::AlignCenter);
+
+    // Champs pour l'adresse de l'expéditeur
+    QLabel *fromLabel = new QLabel("De :", mailWidget);
+    QLineEdit *fromLineEdit = new QLineEdit(mailWidget);
+    fromLineEdit->setPlaceholderText("Adresse email de l'expéditeur");
+
+    // Champs pour l'adresse du destinataire
+    QLabel *toLabel = new QLabel("À :", mailWidget);
+    QLineEdit *toLineEdit = new QLineEdit(mailWidget);
+    toLineEdit->setPlaceholderText("Adresse email du destinataire");
+
+    // Champs pour l'objet
+    QLabel *subjectLabel = new QLabel("Objet :", mailWidget);
+    QLineEdit *subjectLineEdit = new QLineEdit(mailWidget);
+    subjectLineEdit->setPlaceholderText("Sujet de l'email");
+
+    // Champ pour le corps du message
+    QLabel *messageLabel = new QLabel("Message :", mailWidget);
+    QTextEdit *messageTextEdit = new QTextEdit(mailWidget);
+    messageTextEdit->setPlaceholderText("Entrez votre message ici...");
+
+    // Bouton d'envoi
+    QPushButton *sendButton = new QPushButton("Envoyer", mailWidget);
+    sendButton->setStyleSheet("background-color: #4CAF50; color: white; font-weight: bold; padding: 10px; border-radius: 5px;");
+
+    // Ajout des widgets à la disposition principale
+    mainLayout->addWidget(titleLabel);
+    mainLayout->addWidget(fromLabel);
+    mainLayout->addWidget(fromLineEdit);
+    mainLayout->addWidget(toLabel);
+    mainLayout->addWidget(toLineEdit);
+    mainLayout->addWidget(subjectLabel);
+    mainLayout->addWidget(subjectLineEdit);
+    mainLayout->addWidget(messageLabel);
+    mainLayout->addWidget(messageTextEdit);
+    mainLayout->addWidget(sendButton);
+
+    mailWidget->setLayout(mainLayout);
+
+    // Centrer la fenêtre au milieu
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QRect screenGeometry = screen->geometry(); // Obtenir la géométrie de l'écran principal
+    int x = (screenGeometry.width() - mailWidget->width()) / 2;
+    int y = (screenGeometry.height() - mailWidget->height()) / 2;
+    mailWidget->move(x, y); // Positionner au centre
+
+    // Assurez-vous que la fenêtre est au premier plan et focalisée
+    mailWidget->raise();
+    mailWidget->activateWindow();
+
+    mailWidget->show();
+
+    // Connexion du bouton d'envoi
+    connect(sendButton, &QPushButton::clicked, [this, fromLineEdit, toLineEdit, subjectLineEdit, messageTextEdit] {
+        QString from = fromLineEdit->text();
+        QString to = toLineEdit->text();
+        QString subject = subjectLineEdit->text();
+        QString message = messageTextEdit->toPlainText();
+
+        // Validation des champs
+        if (from.isEmpty() || to.isEmpty() || subject.isEmpty() || message.isEmpty()) {
+            QMessageBox::warning(this, "Erreur", "Tous les champs doivent être remplis !");
+            return;
+        }
+
+        // Envoyer l'email
+        smtp smtpClient;
+        bool success = smtpClient.sendEmail(from, to, subject, message);
+
+        if (success) {
+            QMessageBox::information(this, "Succès", "L'email a été envoyé avec succès !");
+        } else {
+            QMessageBox::critical(this, "Échec", "L'envoi de l'email a échoué. Vérifiez les détails et réessayez.");
+        }
+    });
+}
+
+
+
+void MainWindow::showPatientStatistics() {
+    // Instance de la classe `patient`
+    class patient pt;
+
+    // Générer les statistiques pour les patients
+    QPieSeries *series = pt.generatePatientStatistics();
+    if (!series || series->slices().isEmpty()) {
+        QMessageBox::warning(this, "Statistiques des Patients", "Aucune donnée disponible pour les statistiques.");
+        return;
+    }
+
+    // Créer le graphique
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Statistiques des Diagnostiques des Patients");
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    // Vérifiez si un ancien graphique existe déjà dans `frame_2` et le supprimez
+    if (chartView) {
+        delete chartView;
+        chartView = nullptr;
+    }
+
+    // Créer une vue pour le graphique
+    chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    // Attacher la vue au `frame_2` existant
+    chartView->setParent(ui->widget_2);
+    chartView->resize(ui->widget_2->size());
+    chartView->show();
+}
+void MainWindow::resizeEvent(QResizeEvent *event) {
+    QMainWindow::resizeEvent(event);
+    if (chartView) {
+        chartView->resize(ui->widget_2->size()); // Adapter la taille du graphique
+    }
+}
+void MainWindow::afficherPatientParNumSocial()
+{
+    // Récupérer le numéro social depuis le QLineEdit (assurez-vous que le champ est rempli)
+    int numSocial = ui->lineEdit_110->text().toInt();
+
+    // Appeler la méthode rechercherParNumSocial et obtenir le modèle
+    class patient p;
+    QSqlQueryModel *model = p.rechercherParNumSocial(numSocial);
+
+    if (model->rowCount() > 0) {
+        // Associer le modèle à la vue de tableau
+        ui->tableView->setModel(model);
+    } else {
+        qDebug() << "Aucun patient trouvé avec ce numéro social.";
+    }
+}
+
+void MainWindow::on_recherche1_clicked()
+{
+    // Récupérer le numéro social depuis le champ d'entrée
+       QString numSocial = ui->lineEdit_110->text();
+
+       if (numSocial.isEmpty()) {
+           QMessageBox::warning(this, "Recherche", "Veuillez entrer un numéro social !");
+           return;
+       }
+
+       // Appeler la méthode de recherche
+       class patient p;
+       QSqlQueryModel *model = p.rechercherParNumSocial(numSocial.toInt());
+
+       if (model->rowCount() > 0) {
+           // Associer le modèle à la vue TableView
+           ui->tableView->setModel(model);
+       } else {
+           QMessageBox::information(this, "Résultat", "Aucun patient trouvé avec ce numéro social.");
+       }
+}
+

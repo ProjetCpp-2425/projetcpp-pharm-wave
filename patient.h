@@ -4,6 +4,14 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlQueryModel>
+#include <QObject>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QDebug>
+#include <QtCharts/QPieSeries>
+#include "ui_mainwindow.h"
+
+
 
 
 class patient
@@ -54,7 +62,8 @@ public:
     QSqlQueryModel *trier_numSocial_desc();
     QSqlQueryModel *trier_age_asc();
     QSqlQueryModel *trier_age_desc();
-
+  QPieSeries *generatePatientStatistics();
+ QSqlQueryModel*rechercherParNumSocial(int numSocial);
 
 
 
