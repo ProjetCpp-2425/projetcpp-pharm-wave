@@ -6204,7 +6204,7 @@ QTabBar::tab:hover {
 }</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>5</number>
       </property>
       <property name="tabBarAutoHide">
        <bool>false</bool>
@@ -6361,6 +6361,26 @@ QLabel {
            <item>
             <property name="text">
              <string>High-To-Low</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>homme</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>femme</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>nom</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>prenom</string>
             </property>
            </item>
           </widget>
@@ -7770,6 +7790,62 @@ border-radius : 20px;</string>
          <property name="icon">
           <iconset>
            <normaloff>../../../Users/Admin/Downloads/analysis.png</normaloff>../../../Users/Admin/Downloads/analysis.png</iconset>
+         </property>
+        </widget>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_10">
+       <attribute name="title">
+        <string>Arduino</string>
+       </attribute>
+       <widget class="QGroupBox" name="groupBox_29">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>1271</width>
+          <height>631</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color:#D6E7D5;
+
+border-radius : 20px;</string>
+        </property>
+        <property name="title">
+         <string/>
+        </property>
+        <widget class="QLabel" name="PATIENT_6">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>141</width>
+           <height>61</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">*{
+    color: #6FAF92;
+    font-size: 16px; /* Taille du texte (ajustable) */
+    font-weight: normal; /* Style du texte */
+}</string>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:700; font-style:italic;&quot;&gt;PATIENT&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_20">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>90</y>
+           <width>1031</width>
+           <height>421</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
          </property>
         </widget>
        </widget>

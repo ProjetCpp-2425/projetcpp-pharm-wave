@@ -1,5 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#include "arduino.h"
 
 #include "patient.h"
 #include "qchartview.h"
@@ -32,6 +33,7 @@ public:
 
 private slots:
     // Slots for each button click
+    void update_label();
 
     void on_projet_clicked();
     void on_employer_clicked();
@@ -78,11 +80,15 @@ private slots:
     void on_recherche1_clicked();
    // QString fetchRepairData(const QString &idReparation);
     void generatePDF(const QString &filePath, const QString &repairData, const QImage &qrCodeImage);
+
     QImage generateQRCodeImage(const QString &data);
     QString fetchPatientData(const QString &idPatient);
 
 private:
     Ui::MainWindow *ui;
     class patient p;
+    QByteArray data; // variable contenant les données reçues
+
+    Arduino A;
 };
 #endif // MAINWINDOW_H

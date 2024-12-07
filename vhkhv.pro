@@ -1,3 +1,7 @@
+
+
+QT       += core gui sql printsupport widgets serialport
+QT       += core gui  serialport
 QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -17,6 +21,7 @@ QT += core gui widgets printsupport
 # Add the qrcodegen source file
 INCLUDEPATH += $$PWD/QR-Code-generator-master/cpp
 SOURCES += $$PWD/QR-Code-generator-master/cpp/qrcodegen.cpp \
+    arduino.cpp
 
 SOURCES += \
     connection.cpp \
@@ -26,6 +31,7 @@ SOURCES += \
     smtp.cpp
 
 HEADERS += \
+    arduino.h \
     connection.h \
     mainwindow.h \
     patient.h \

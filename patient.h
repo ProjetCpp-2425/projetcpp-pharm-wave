@@ -62,8 +62,14 @@ public:
     QSqlQueryModel *trier_numSocial_desc();
     QSqlQueryModel *trier_age_asc();
     QSqlQueryModel *trier_age_desc();
+
+    QSqlQueryModel *trier_genre_asc();
+    QSqlQueryModel *trier_genre_desc();
+    QSqlQueryModel *filtrer_par_genre(const QString &genre);
+
   QPieSeries *generatePatientStatistics();
  QSqlQueryModel*rechercherParNumSocial(int numSocial);
+ QSqlQueryModel *rechercherParEmail(const QString& email);
 
 
 

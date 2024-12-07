@@ -50,6 +50,15 @@ MainWindow::MainWindow(QWidget *patient)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    int ret=A.connect_arduino(); // lancer la connexion à arduino
+    switch(ret){
+    case(0):qDebug()<< "arduino is available and connected to : "<< A.getarduino_port_name();
+        break;
+    case(1):qDebug() << "arduino is available but not connected to :" <<A.getarduino_port_name();
+       break;
+    case(-1):qDebug() << "arduino is not available";
+    }
+     QObject::connect(A.getserial(),SIGNAL(readyRead()),this,SLOT(update_label())); // permet de lancer
     ui->tableView->setModel(p.afficher());
 
     // Connect buttons to respective slots
@@ -76,6 +85,17 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+void MainWindow::update_label() {
+    QByteArray data = A.getserial()->readAll();
+
+    // Check if data contains "1"
+    if (!data.isEmpty() && data.trimmed() == "1") {
+        ui->label_20->setText("bienvenue  chez pharmwave");
+    } else {
+        ui->label_20->setText("Aucune personne");
+    }
+}
+
 // Slot to switch to "projet_3" widget
 void MainWindow::on_projet_clicked()
 {
@@ -273,7 +293,7 @@ void MainWindow::on_PDF_clicked()
 
 
 
-void MainWindow::on_trier_clicked() {
+/*void MainWindow::on_trier_clicked() {
 
     class patient s;
     if (ui->lowHigh->currentText() == "Low-To-High") {  // Sorting in ascending order
@@ -301,7 +321,109 @@ void MainWindow::on_trier_clicked() {
 
     }
     }
+}*/
+// LKJLJ?JJO
+
+/*void MainWindow::on_trier_clicked()
+{
+    class patient s;
+
+    if (ui->lowHigh->currentText() == "Low-To-High") {
+        ui->tableView->setModel(s.trier_age_asc());
+        QMessageBox::information(this, QObject::tr("Tri réussi"),
+                                 QObject::tr("Tri par âge croissant réussi."),
+                                 QMessageBox::Ok);
+    } else if (ui->lowHigh->currentText() == "High-To-Low") {
+        ui->tableView->setModel(s.trier_age_desc());
+        QMessageBox::information(this, QObject::tr("Tri réussi"),
+                                 QObject::tr("Tri par âge décroissant réussi."),
+                                 QMessageBox::Ok);
+    } else if (ui->lowHigh->currentText() == "homme") {
+        ui->tableView->setModel(s.filtrer_par_genre("homme"));
+        QMessageBox::information(this, QObject::tr("Filtre appliqué"),
+                                 QObject::tr("Filtré par genre : homme."),
+                                 QMessageBox::Ok);
+    } else if (ui->lowHigh->currentText() == "femme") {
+        ui->tableView->setModel(s.filtrer_par_genre("femme"));
+        QMessageBox::information(this, QObject::tr("Filtre appliqué"),
+                                 QObject::tr("Filtré par genre : femme."),
+                                 QMessageBox::Ok);
+    } else {
+        QMessageBox::critical(this, QObject::tr("Erreur"),
+                              QObject::tr("Aucun critère de tri valide sélectionné."),
+                              QMessageBox::Cancel);
+    }
+}*/
+void MainWindow::on_trier_clicked()
+{
+    class patient s;
+
+    // Tri par âge croissant
+    if (ui->lowHigh->currentText() == "Low-To-High") {
+        if (ui->age->currentText() == "AGE") {
+            ui->tableView->setModel(s.trier_age_asc());
+            QMessageBox::information(this, QObject::tr("Tri réussi"),
+                                     QObject::tr("Tri par âge croissant réussi."),
+                                     QMessageBox::Ok);
+        } else if (ui->age->currentText() == "Nom") {
+            ui->tableView->setModel(s.trier_nom_asc());  // Tri par nom croissant
+            QMessageBox::information(this, QObject::tr("Tri réussi"),
+                                     QObject::tr("Tri par nom croissant réussi."),
+                                     QMessageBox::Ok);
+        } else if (ui->age->currentText() == "Prénom") {
+            ui->tableView->setModel(s.trier_prenom_asc());  // Tri par prénom croissant
+            QMessageBox::information(this, QObject::tr("Tri réussi"),
+                                     QObject::tr("Tri par prénom croissant réussi."),
+                                     QMessageBox::Ok);
+        } else {
+            QMessageBox::critical(this, QObject::tr("Erreur"),
+                                  QObject::tr("Aucun critère de tri valide sélectionné."),
+                                  QMessageBox::Cancel);
+        }
+    }
+    // Tri par âge décroissant
+    else if (ui->lowHigh->currentText() == "High-To-Low") {
+        if (ui->age->currentText() == "AGE") {
+            ui->tableView->setModel(s.trier_age_desc());
+            QMessageBox::information(this, QObject::tr("Tri réussi"),
+                                     QObject::tr("Tri par âge décroissant réussi."),
+                                     QMessageBox::Ok);
+        } else if (ui->age->currentText() == "Nom") {
+            ui->tableView->setModel(s.trier_nom_desc());  // Tri par nom décroissant
+            QMessageBox::information(this, QObject::tr("Tri réussi"),
+                                     QObject::tr("Tri par nom décroissant réussi."),
+                                     QMessageBox::Ok);
+        } else if (ui->age->currentText() == "Prénom") {
+            ui->tableView->setModel(s.trier_prenom_desc());  // Tri par prénom décroissant
+            QMessageBox::information(this, QObject::tr("Tri réussi"),
+                                     QObject::tr("Tri par prénom décroissant réussi."),
+                                     QMessageBox::Ok);
+        } else {
+            QMessageBox::critical(this, QObject::tr("Erreur"),
+                                  QObject::tr("Aucun critère de tri valide sélectionné."),
+                                  QMessageBox::Cancel);
+        }
+    }
+    // Filtrer par genre "homme"
+    else if (ui->lowHigh->currentText() == "homme") {
+        ui->tableView->setModel(s.filtrer_par_genre("homme"));
+        QMessageBox::information(this, QObject::tr("Filtre appliqué"),
+                                 QObject::tr("Filtré par genre : homme."),
+                                 QMessageBox::Ok);
+    }
+    // Filtrer par genre "femme"
+    else if (ui->lowHigh->currentText() == "femme") {
+        ui->tableView->setModel(s.filtrer_par_genre("femme"));
+        QMessageBox::information(this, QObject::tr("Filtre appliqué"),
+                                 QObject::tr("Filtré par genre : femme."),
+                                 QMessageBox::Ok);
+    } else {
+        QMessageBox::critical(this, QObject::tr("Erreur"),
+                              QObject::tr("Aucun critère de tri valide sélectionné."),
+                              QMessageBox::Cancel);
+    }
 }
+
 
 
 
@@ -627,7 +749,7 @@ void MainWindow::afficherPatientParNumSocial()
     }
 }
 
-void MainWindow::on_recherche1_clicked()
+/*void MainWindow::on_recherche1_clicked()
 {
     // Récupérer le numéro social depuis le champ d'entrée
        QString numSocial = ui->lineEdit_110->text();
@@ -647,7 +769,48 @@ void MainWindow::on_recherche1_clicked()
        } else {
            QMessageBox::information(this, "Résultat", "Aucun patient trouvé avec ce numéro social.");
        }
+}*/
+void MainWindow::on_recherche1_clicked()
+{
+    // Récupérer le contenu du champ d'entrée
+    QString input = ui->lineEdit_110->text();
+
+    if (input.isEmpty()) {
+        QMessageBox::warning(this, "Recherche", "Veuillez entrer un numéro social ou une adresse e-mail !");
+        return;
+    }
+
+    // Vérifier si c'est un numéro ou un e-mail
+    bool isNumber;
+    int numSocial = input.toInt(&isNumber); // Conversion en nombre
+    QSqlQueryModel *model = nullptr;
+    class patient p;
+
+    if (isNumber) {
+        // Recherche par numéro social
+        model = p.rechercherParNumSocial(numSocial);
+    } else {
+        // Validation de l'adresse e-mail
+        QRegularExpression emailRegex("^[\\w\\.]+@[\\w\\.]+\\.[a-z]{2,}$");
+        if (!emailRegex.match(input).hasMatch()) {
+            QMessageBox::warning(this, "Recherche", "Veuillez entrer une adresse e-mail valide !");
+            return;
+        }
+
+        // Recherche par e-mail
+        model = p.rechercherParEmail(input);
+    }
+
+    // Afficher les résultats
+    if (model && model->rowCount() > 0) {
+        ui->tableView->setModel(model);
+    } else {
+        QMessageBox::information(this, "Résultat", "Aucun patient trouvé avec les critères fournis.");
+    }
 }
+
+
+
 QImage MainWindow::generateQRCodeImage(const QString &data)
 {
     const qrcodegen::QrCode qr = qrcodegen::QrCode::encodeText(data.toStdString().c_str(), qrcodegen::QrCode::Ecc::LOW);
@@ -745,7 +908,7 @@ void MainWindow::generatePDF(const QString &filePath, const QString &repairData,
      pdfWriter.setPageOrientation(QPageLayout::Portrait);
 
      // Set background color for the top section
-     painter.fillRect(QRect(0, 0, pdfWriter.width(), 1000), QColor(255, 140, 0));  // Background color (orange)
+     painter.fillRect(QRect(0, 0, pdfWriter.width(), 1000), QColor(0, 255, 0));  // Background color (green)
 
      // Title font and text
      QFont titleFont("Arial", 24, QFont::Bold);
@@ -770,8 +933,7 @@ void MainWindow::generatePDF(const QString &filePath, const QString &repairData,
      // Generate a URL or text for the QR code with the repair data
      QString qrCodeData = "Repair Details:\n" + repairData;
 
-     // Generate the QR code from the data (you will need a library like Qt's QZXing or similar for generating the QR)
-   //  QImage qrImage = generateQRCode(qrCodeData);  // Assume generateQRCode is a function to create the QR image
+
 
      // Adjust the Y position before drawing the QR code
      yPos += 80;  // Add more space before the QR code (increased from 50 to 80)
@@ -918,14 +1080,7 @@ void MainWindow:: on_QR_clicked()
                 return;
             }
 
-            // Fetch repair data from the database using the ID Reparation
-             /*  QString patientData = fetchPatientData(idPatient);
-             // Fetch repair details
 
-             if (patientData.isEmpty()) {
-                QMessageBox::warning(this, "Error", "No patient data found for this Social Number.");
-                return;
-            }*/
                QString patientData = fetchPatientData(idPatient);
                if (patientData.isEmpty()) {
                    QMessageBox::warning(this, "Erreur", "Aucune donnée trouvée pour ce numéro de patient.");
