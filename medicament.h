@@ -1,6 +1,5 @@
 #ifndef MEDICAMENT_H
 #define MEDICAMENT_H
-#include "qsqlquerymodel.h"
 #include<QString>
 #include<QSqlQuery>
 #include<QSqlQueryModel>
@@ -10,7 +9,7 @@
 #include <QtCharts/QBarSet>
 #include <QtCharts/QChart>
 #include <QtCharts/QBarCategoryAxis>
-//#include <QtCharts>
+#include <QtCharts>
 
 class medicament
 {
@@ -38,7 +37,7 @@ public:
 
 
     bool ajouter();
-   virtual bool modifier(int vignette, const QString &attribut, const QVariant &nouvelleValeur);
+    bool modifier(int vignette, const QString &attribut, const QVariant &nouvelleValeur);
 
     bool supprimer(int vignette);
     bool existe(int vignette);        // Vérifier si un médicament existe en fonction de sa vignette
