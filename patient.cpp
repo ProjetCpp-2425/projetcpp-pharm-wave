@@ -24,7 +24,6 @@
 
 
 #include "patient.h"
-#include "qpushbutton.h"
 
 
 
@@ -299,116 +298,6 @@ QSqlQueryModel *patient::trier_age_desc()
 
     return model;
 }
-QSqlQueryModel *patient::trier_genre_asc()
-{
-    QSqlQueryModel *model = new QSqlQueryModel();
-    model->setQuery("SELECT * FROM PATIENT ORDER BY GENRE ASC");  // Tri croissant (Femme -> Homme)
-
-    model->setHeaderData(0, Qt::Horizontal, QObject::tr("Nom"));
-    model->setHeaderData(1, Qt::Horizontal, QObject::tr("Prénom"));
-    model->setHeaderData(2, Qt::Horizontal, QObject::tr("Âge"));
-    model->setHeaderData(3, Qt::Horizontal, QObject::tr("GENRE"));
-    model->setHeaderData(4, Qt::Horizontal, QObject::tr("Numéro Social"));
-    model->setHeaderData(5, Qt::Horizontal, QObject::tr("Téléphone"));
-    model->setHeaderData(6, Qt::Horizontal, QObject::tr("ADRESSE"));
-    model->setHeaderData(7, Qt::Horizontal, QObject::tr("E-mail"));
-
-    return model;
-}
-
-
-
-
-
-
-QSqlQueryModel *patient::filtrer_par_genre(const QString &genre)
-{
-    QSqlQueryModel *model = new QSqlQueryModel();
-    model->setQuery("SELECT * FROM PATIENT WHERE GENRE = '" + genre + "'");
-
-    model->setHeaderData(0, Qt::Horizontal, QObject::tr("Nom"));
-    model->setHeaderData(1, Qt::Horizontal, QObject::tr("Prénom"));
-    model->setHeaderData(2, Qt::Horizontal, QObject::tr("Âge"));
-    model->setHeaderData(3, Qt::Horizontal, QObject::tr("GENRE"));
-    model->setHeaderData(4, Qt::Horizontal, QObject::tr("Numéro Social"));
-    model->setHeaderData(5, Qt::Horizontal, QObject::tr("Téléphone"));
-    model->setHeaderData(6, Qt::Horizontal, QObject::tr("ADRESSE"));
-    model->setHeaderData(7, Qt::Horizontal, QObject::tr("E-mail"));
-
-    return model;
-}
-
-QSqlQueryModel *patient::trier_nom_asc()
-{
-    QSqlQueryModel *model = new QSqlQueryModel();
-    model->setQuery("SELECT * FROM PATIENT ORDER BY Nom ASC");
-
-    model->setHeaderData(0, Qt::Horizontal, QObject::tr("Nom"));
-    model->setHeaderData(1, Qt::Horizontal, QObject::tr("Prénom"));
-    model->setHeaderData(2, Qt::Horizontal, QObject::tr("Âge"));
-    model->setHeaderData(3, Qt::Horizontal, QObject::tr("GENRE"));
-    model->setHeaderData(4, Qt::Horizontal, QObject::tr("Numéro Social"));
-    model->setHeaderData(5, Qt::Horizontal, QObject::tr("Téléphone"));
-    model->setHeaderData(6, Qt::Horizontal, QObject::tr("ADRESSE"));
-    model->setHeaderData(7, Qt::Horizontal, QObject::tr("E-mail"));
-
-    return model;
-}
-
-QSqlQueryModel *patient::trier_nom_desc()
-{
-    QSqlQueryModel *model = new QSqlQueryModel();
-    model->setQuery("SELECT * FROM PATIENT ORDER BY Nom DESC");
-
-    model->setHeaderData(0, Qt::Horizontal, QObject::tr("Nom"));
-    model->setHeaderData(1, Qt::Horizontal, QObject::tr("Prénom"));
-    model->setHeaderData(2, Qt::Horizontal, QObject::tr("Âge"));
-    model->setHeaderData(3, Qt::Horizontal, QObject::tr("GENRE"));
-    model->setHeaderData(4, Qt::Horizontal, QObject::tr("Numéro Social"));
-    model->setHeaderData(5, Qt::Horizontal, QObject::tr("Téléphone"));
-    model->setHeaderData(6, Qt::Horizontal, QObject::tr("ADRESSE"));
-    model->setHeaderData(7, Qt::Horizontal, QObject::tr("E-mail"));
-
-    return model;
-}
-QSqlQueryModel *patient::trier_prenom_asc()
-{
-    QSqlQueryModel *model = new QSqlQueryModel();
-    model->setQuery("SELECT * FROM PATIENT ORDER BY Prénom ASC");
-
-    model->setHeaderData(0, Qt::Horizontal, QObject::tr("Nom"));
-    model->setHeaderData(1, Qt::Horizontal, QObject::tr("Prénom"));
-    model->setHeaderData(2, Qt::Horizontal, QObject::tr("Âge"));
-    model->setHeaderData(3, Qt::Horizontal, QObject::tr("GENRE"));
-    model->setHeaderData(4, Qt::Horizontal, QObject::tr("Numéro Social"));
-    model->setHeaderData(5, Qt::Horizontal, QObject::tr("Téléphone"));
-    model->setHeaderData(6, Qt::Horizontal, QObject::tr("ADRESSE"));
-    model->setHeaderData(7, Qt::Horizontal, QObject::tr("E-mail"));
-
-    return model;
-}
-
-QSqlQueryModel *patient::trier_prenom_desc()
-{
-    QSqlQueryModel *model = new QSqlQueryModel();
-    model->setQuery("SELECT * FROM PATIENT ORDER BY Prénom DESC");
-
-    model->setHeaderData(0, Qt::Horizontal, QObject::tr("Nom"));
-    model->setHeaderData(1, Qt::Horizontal, QObject::tr("Prénom"));
-    model->setHeaderData(2, Qt::Horizontal, QObject::tr("Âge"));
-    model->setHeaderData(3, Qt::Horizontal, QObject::tr("GENRE"));
-    model->setHeaderData(4, Qt::Horizontal, QObject::tr("Numéro Social"));
-    model->setHeaderData(5, Qt::Horizontal, QObject::tr("Téléphone"));
-    model->setHeaderData(6, Qt::Horizontal, QObject::tr("ADRESSE"));
-    model->setHeaderData(7, Qt::Horizontal, QObject::tr("E-mail"));
-
-    return model;
-}
-
-
-
-
-
 QPieSeries* patient::generatePatientStatistics() {
     // Créer une série pour le diagramme circulaire
     QPieSeries *series = new QPieSeries();
@@ -447,7 +336,7 @@ QPieSeries* patient::generatePatientStatistics() {
 
     // Ajouter les données au graphique
     series->append("AGE 20" , fluCases);
-    series->append("Age different de 20", otherDiseases);
+    series->append("Autres", otherDiseases);
 
     // Style des tranches
     QPieSlice *fluSlice = series->slices().at(0);
@@ -457,7 +346,7 @@ QPieSeries* patient::generatePatientStatistics() {
 
     QPieSlice *otherSlice = series->slices().at(1);
     otherSlice->setBrush(QColor("#FF5722")); // Rouge-orange pour les autres maladies
-    otherSlice->setLabel(QString("Age different de 20 (%1%)")
+    otherSlice->setLabel(QString("Autres (%1%)")
                              .arg((otherDiseases * 100.0) / totalPatients, 0, 'f', 1));
 
     // Activer les étiquettes
@@ -491,30 +380,3 @@ QSqlQueryModel* patient::rechercherParNumSocial(int numSocial)
 
     return model;
 }
-QSqlQueryModel* patient::rechercherParEmail(const QString& email)
-{
-    QSqlQueryModel *model = new QSqlQueryModel();
-
-    // Préparer la requête SQL pour rechercher un patient par adresse e-mail
-    QSqlQuery query;
-    query.prepare("SELECT NOM, PRENOM, AGE, GENRE, NUM_SOCIALE, TELEPHONE, ADRESSE, E_MAIL FROM PATIENT WHERE E_MAIL = :email");
-    query.bindValue(":email", email);
-
-    // Exécuter la requête
-    if (query.exec()) {
-        model->setQuery(query);  // Associer les résultats de la requête au modèle
-        model->setHeaderData(0, Qt::Horizontal, QObject::tr("Nom"));
-        model->setHeaderData(1, Qt::Horizontal, QObject::tr("Prénom"));
-        model->setHeaderData(2, Qt::Horizontal, QObject::tr("Âge"));
-        model->setHeaderData(3, Qt::Horizontal, QObject::tr("Genre"));
-        model->setHeaderData(4, Qt::Horizontal, QObject::tr("Numéro Social"));
-        model->setHeaderData(5, Qt::Horizontal, QObject::tr("Téléphone"));
-        model->setHeaderData(6, Qt::Horizontal, QObject::tr("Adresse"));
-        model->setHeaderData(7, Qt::Horizontal, QObject::tr("E-mail"));
-    } else {
-        qDebug() << "Erreur lors de la recherche du patient par e-mail : " << query.lastError().text();
-    }
-
-    return model;
-}
-

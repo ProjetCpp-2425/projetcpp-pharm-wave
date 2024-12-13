@@ -1,8 +1,11 @@
+#include <QApplication>
 #include "mainwindow.h"
-#include "connection.h"
 #include <QApplication>
 #include <QMessageBox>
 #include "connection.h"
+#include "finance.h"
+
+
 
 int main(int argc, char *argv[])
 {
